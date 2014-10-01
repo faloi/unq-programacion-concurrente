@@ -1,4 +1,4 @@
-package edu.unq.pconc;
+package edu.unq.pconc.utils;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
