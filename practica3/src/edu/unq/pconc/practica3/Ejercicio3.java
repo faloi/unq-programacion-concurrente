@@ -2,56 +2,48 @@ package edu.unq.pconc.practica3;
 
 import edu.unq.pconc.utils.Runner;
 
-import java.util.Random;
 import java.util.concurrent.Semaphore;
+
+import static edu.unq.pconc.utils.Utils.print;
 
 public class Ejercicio3 {
   public static void main(String[] args) {
-    Semaphore semC = new Semaphore(0);
-    Semaphore semE = new Semaphore(0);
-    Semaphore semR = new Semaphore(0);
+    Semaphore semR = new Semaphore(1);
+    Semaphore semI = new Semaphore(0);
     Semaphore semO = new Semaphore(0);
+    Semaphore semOk1 = new Semaphore(0);
+    Semaphore semOk2 = new Semaphore(0);
 
     new Runner(
       () -> {
-        semC.acquireUninterruptibly();
-        print("C");
-        semR.release();
-        semE.release();
+        semR.acquireUninterruptibly();
+        print("R ");
+        semI.release();
 
-        randomSleep();
-
-        semE.acquireUninterruptibly();
-        print("E");
-        semO.release();
+        semOk1.acquireUninterruptibly();
+        print("OK ");
+        semOk2.release();
       },
 
       () -> {
-        print("A");
-        semC.release();
-
-        semR.acquireUninterruptibly();
-        print("R");
+        semI.acquireUninterruptibly();
+        print("I ");
         semO.release();
 
-        semO.acquireUninterruptibly(2);
-        print("O");
-
+        semOk2.acquireUninterruptibly();
+        print("OK ");
         print("\n");
+        semR.release();
+      },
+
+      () -> {
+        semO.acquireUninterruptibly();
+        print("O ");
+
+        print("OK ");
+        semOk1.release();
       }
     ).start();
   }
 
-  private static void randomSleep() {
-    try {
-      if (new Random().nextBoolean())
-        Thread.sleep(20);
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private static void print(String value) {
-    System.out.print(value);
-  }
 }
